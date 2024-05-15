@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Order;
+use App\Models\OrderInfo;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -12,12 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-
-use DB;
-use Auth;
-use Debugbar;
-
-class OrderDataTable extends DataTable
+class OrderInfoDataTable extends DataTable
 {
     /**
      * Build DataTable class.
@@ -25,40 +20,22 @@ class OrderDataTable extends DataTable
      * @param QueryBuilder $query Results from query() method.
      * @return \Yajra\DataTables\EloquentDataTable
      */
-    public function dataTable($query)
+    public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return datatables()
-        ->eloquent($query)
-        ->addColumn('action',  function($row){
-            $actionBtn = '<a href="' .'"  class="btn details btn-primary">Details</a>';
-            return $actionBtn;
-        })
-        ->addColumn('total', function ($order) {
-            return number_format($order->items->map(function($item) {
-                return  $item->pivot->quantity * $item->sell_price;
-            })->sum(), 2);
-        })
-        ->addColumn('items', function ($order) {
-            return  $order->items->map(function($item) {
-                return $item->description;
-            })->implode('<br />');
-        })->rawColumns(['action','items']);
+        return (new EloquentDataTable($query))
+            ->addColumn('action', 'orderinfo.action')
+            ->setRowId('id');
     }
 
     /**
      * Get query source of dataTable.
      *
-     * @param \App\Models\Order $model
+     * @param \App\Models\OrderInfo $model
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function query()
+    public function query(OrderInfo $model): QueryBuilder
     {
-        $orders = Order::with(['customer','items'])->whereHas('customer', function($query) {
-            $query->where('user_id', Auth::id());
-        })->orderBy('date_placed', 'DESC');
-        DebugBar::info($orders);
-        
-        return $orders;
+        return $model->newQuery();
     }
 
     /**
@@ -69,7 +46,7 @@ class OrderDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('order-table')
+                    ->setTableId('orderinfo-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
@@ -93,16 +70,18 @@ class OrderDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('orderinfo_id'),
-            Column::make('date_placed'),
-            Column::make('total'),
-            Column::make('items'),
-            
             Column::computed('action')
                   ->exportable(false)
                   ->printable(false)
                   ->width(60)
                   ->addClass('text-center'),
+            Column::make('id'),
+            Column::make('item_quantity'),
+            Column::make('total_price'),
+            Column::make('date_placed'),
+            Column::make('date_shipped'),
+            Column::make('shipping'),
+            Column::make('status'),
         ];
     }
 
@@ -113,6 +92,6 @@ class OrderDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Order_' . date('YmdHis');
+        return 'OrderInfo_' . date('YmdHis');
     }
 }

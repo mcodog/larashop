@@ -11,10 +11,10 @@
             <div class="col-sm-6 col-md-6 col-md-offset-3 col-sm-offset-3">
                 <ul class="list-group">
                     @foreach($products as $product)
-                            <li class="list-group-item">
+                            <li class="list-group-item d-flex justify-content-around">
                                 <span class="badge">{{ $product['qty'] }}</span>
-                                <strong>{{ $product['item']['description'] }}</strong>
-                                <span class="label label-success">{{ $product['price'] }}</span>
+                                <strong>{{ $product['item']['name'] }}</strong>
+                                <span class="label label-success">${{ $product['item']['sell_price'] }}</span>
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-toggle="dropdown">Action <span class="caret"></span></button>
                                     <ul class="dropdown-menu">
@@ -33,7 +33,7 @@
         </div>
         <div class="row">
             <div class="col-sm-6 col-md-6 col-md-offset-3 col-sm-offset-3">
-                <strong>Total: {{ $totalPrice }}</strong>
+                <strong>Total: ${{ $totalPrice }}</strong>
             </div>
         </div>
         <hr>

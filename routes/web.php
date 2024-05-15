@@ -18,6 +18,9 @@ use App\Http\Controllers\UserController;
 */
 Route::get('shopping-cart', [ItemController::class, 'getCart'])->name('getCart');
 
+Route::get('item/create', function() {
+    return view('item.create');
+})->name('item.create');
 
 
 // Route::get('/admin/customers',[DashboardController::class, 'getCustomers'])->name('admin.customers');

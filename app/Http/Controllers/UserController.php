@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Item;
-use App\DataTables\OrderDataTable;
+use App\DataTables\OrderInfoDataTable;
 use App\DataTables\UsersDataTable;
 use Barryvdh\Debugbar\Facades\Debugbar as FacadesDebugbar;
 use DB;
@@ -72,7 +72,7 @@ class UserController extends Controller
         }
     }
 
-    public function getProfile(OrderDataTable $dataTable)
+    public function getProfile(OrderInfoDataTable $dataTable)
     {
         
         // $user = User::find(3)->customer;

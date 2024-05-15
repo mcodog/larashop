@@ -239,7 +239,12 @@ class ItemController extends Controller
         }
         $oldCart = Session::get('cart');
         $cart = new Cart($oldCart);
-        // dd($cart->items);
+        $quantityy = 0;
+        $total_price = 0;
+        foreach($cart->items as $carts) {
+            $quantityy = $quantityy + $carts['qty'];
+            $total_price = $total_price + $carts['price'];
+        }
         try {
             DB::beginTransaction();
             $order = new Order();
@@ -247,13 +252,15 @@ class ItemController extends Controller
             $customer =  Customer::where('user_id', Auth::id())->first();
             // dd($cart->items);
 	        // $customer->orders()->save($order);
-            $order->customer_id = $customer->customer_id;
+            $order->customer_id = $customer->user_id;
             $order->date_placed = now();
             $order->date_shipped = Carbon::now()->addDays(5);
             // $order->shipvia = $request->shipper_id;
             // $order->shipping = $request->shipping;
             $order->shipping = 10.00  ;
             $order->status = 'Processing';
+            $order->total_price = $total_price;
+            $order->item_quantity = $quantityy;
             $order->save();
             // dd($cart->items);
     	    foreach($cart->items as $items){
@@ -277,7 +284,7 @@ class ItemController extends Controller
             }
             // dd($order);
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             // dd($e->getMessage());
 	        DB::rollback();
             // dd($order);
